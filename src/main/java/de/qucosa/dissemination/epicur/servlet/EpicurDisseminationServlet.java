@@ -16,7 +16,10 @@
 
 package de.qucosa.dissemination.epicur.servlet;
 
-import de.dnb.xepicur.*;
+import de.dnb.xepicur.Epicur;
+import de.qucosa.dissemination.epicur.model.EpicurBuilder;
+import de.qucosa.dissemination.epicur.model.EpicurRecordBuilder;
+import de.qucosa.dissemination.epicur.model.UpdateStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,27 +51,13 @@ public class EpicurDisseminationServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
-            Epicur epicur = new Epicur();
+            EpicurBuilder epicurBuilder = new EpicurBuilder()
+                    .buildAdministrativeDataSection(UpdateStatus.urn_new)
+                    .addRecord(new EpicurRecordBuilder()
+                            .identifier("urn:nbn:de", "urn:nbn:de:bsz:14-qucosa-201469")
+                            .getEpicurRecordInstance());
 
-            UpdateStatusType updateStatus = new UpdateStatusType();
-            updateStatus.setType("urn_new");
-
-            DeliveryType delivery = new DeliveryType();
-            delivery.setUpdateStatus(updateStatus);
-
-            AdministrativeDataType administrativeData = new AdministrativeDataType();
-            administrativeData.setDelivery(delivery);
-
-            epicur.setAdministrativeData(administrativeData);
-
-            IdentifierType identifier = new IdentifierType();
-            identifier.setScheme("urn:nbn:de");
-            identifier.setValue("urn:nbn:de:bsz:14-qucosa-201469");
-
-            RecordType record = new RecordType();
-            record.setIdentifier(identifier);
-
-            epicur.getRecord().add(record);
+            Epicur epicur = epicurBuilder.getEpicurInstance();
 
             marshaller.marshal(epicur, resp.getWriter());
         } catch (Exception e) {
