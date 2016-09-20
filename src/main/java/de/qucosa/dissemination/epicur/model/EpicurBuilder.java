@@ -30,7 +30,7 @@ public class EpicurBuilder {
         return this;
     }
 
-    public Epicur getEpicurInstance() {
+    public Epicur build() {
         return epicur;
     }
 
