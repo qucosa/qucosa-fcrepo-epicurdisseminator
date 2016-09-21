@@ -22,8 +22,10 @@ public class EpicurRecordBuilder {
     private static final Namespace METS = Namespace.getNamespace("mets", "http://www.loc.gov/METS/");
     private static final Namespace XLINK = Namespace.getNamespace("xlink", "http://www.w3.org/1999/xlink");
 
-    private static final XPathExpression XPATH_IDENTIFIER = XPathFactory.instance()
+    private static final XPathExpression XPATH_QUCOSA_URN = XPathFactory.instance()
             .compile("//mods:mods/mods:identifier[@type='qucosa:urn']", Filters.fpassthrough(), null, MODS);
+    private static final XPathExpression XPATH_URN_FALLBACK = XPathFactory.instance()
+            .compile("//mods:mods/mods:identifier[@type='urn']", Filters.fpassthrough(), null, MODS);
     private static final XPathExpression XPATH_FILE = XPathFactory.instance()
             .compile("//mets:fileGrp[@USE='DOWNLOAD']/mets:file", Filters.fpassthrough(), null, METS);
 
@@ -38,8 +40,15 @@ public class EpicurRecordBuilder {
         this.metsDocument = metsDocument;
     }
 
-    public EpicurRecordBuilder addIdentifier() {
-        Element identifierElement = (Element) XPATH_IDENTIFIER.evaluateFirst(metsDocument);
+    public EpicurRecordBuilder addIdentifier() throws MetadataElementMissing {
+        Element identifierElement = (Element) XPATH_QUCOSA_URN.evaluateFirst(metsDocument);
+        if (identifierElement == null) {
+            identifierElement = (Element) XPATH_URN_FALLBACK.evaluateFirst(metsDocument);
+        }
+        if (identifierElement == null) {
+            throw new MetadataElementMissing("No URN identifier found");
+        }
+
         String urnString = identifierElement.getTextTrim();
         this.identifier = new IdentifierType();
         this.identifier.setScheme("urn:nbn:de");
@@ -75,22 +84,22 @@ public class EpicurRecordBuilder {
         return this;
     }
 
-    private String extractMimetype(Element fileElement) throws MetsFormatException {
+    private String extractMimetype(Element fileElement) throws MetadataElementMissing {
         String mimetype = fileElement.getAttributeValue("MIMETYPE");
         if (mimetype == null || mimetype.isEmpty()) {
-            throw new MetsFormatException("Missing 'mimetype' attribute on <mets:file> element");
+            throw new MetadataElementMissing("Missing 'mimetype' attribute on <mets:file> element");
         }
         return mimetype;
     }
 
-    private String extractTransferUrl(Element fileElement) throws MetsFormatException {
+    private String extractTransferUrl(Element fileElement) throws MetadataElementMissing {
         Element fLocat = fileElement.getChild("FLocat", METS);
         if (fLocat == null) {
-            throw new MetsFormatException("Missing <mets:FLocat> element");
+            throw new MetadataElementMissing("Missing <mets:FLocat> element");
         }
         String href = fLocat.getAttributeValue("href", XLINK);
         if (href == null) {
-            throw new MetsFormatException("Missing 'href' attribute on <mets:FLocat> element");
+            throw new MetadataElementMissing("Missing 'href' attribute on <mets:FLocat> element");
         }
         return href;
     }
