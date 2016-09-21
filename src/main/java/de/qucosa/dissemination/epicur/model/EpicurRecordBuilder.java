@@ -4,6 +4,7 @@ import de.dnb.xepicur.FormatType;
 import de.dnb.xepicur.IdentifierType;
 import de.dnb.xepicur.RecordType;
 import de.dnb.xepicur.ResourceType;
+import org.apache.commons.lang3.text.StrSubstitutor;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
@@ -11,23 +12,24 @@ import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class EpicurRecordBuilder {
-
-
     private static final Namespace MODS = Namespace.getNamespace("mods", "http://www.loc.gov/mods/v3");
     private static final Namespace METS = Namespace.getNamespace("mets", "http://www.loc.gov/METS/");
     private static final Namespace XLINK = Namespace.getNamespace("xlink", "http://www.w3.org/1999/xlink");
 
-    private static final XPathFactory X_PATH_FACTORY = XPathFactory.instance();
-    private static final XPathExpression XPATH_IDENTIFIER =
-            X_PATH_FACTORY.compile("//mods:mods/mods:identifier[@type='qucosa:urn']", Filters.fpassthrough(), null, MODS);
-    private static final XPathExpression XPATH_FILE =
-            X_PATH_FACTORY.compile("//mets:fileGrp[@USE='DOWNLOAD']/mets:file", Filters.fpassthrough(), null, METS);
+    private static final XPathExpression XPATH_IDENTIFIER = XPathFactory.instance()
+            .compile("//mods:mods/mods:identifier[@type='qucosa:urn']", Filters.fpassthrough(), null, MODS);
+    private static final XPathExpression XPATH_FILE = XPathFactory.instance()
+            .compile("//mets:fileGrp[@USE='DOWNLOAD']/mets:file", Filters.fpassthrough(), null, METS);
 
     private final Document metsDocument;
+    private final Map<String, String> valuesMap = new HashMap<>();
+    private final StrSubstitutor substitutor = new StrSubstitutor(valuesMap, "##", "##");
 
     private IdentifierType identifier;
     private List<ResourceType> resources = new LinkedList<>();
@@ -45,12 +47,29 @@ public class EpicurRecordBuilder {
         return this;
     }
 
-    public EpicurRecordBuilder addResources() throws Exception {
+    public EpicurRecordBuilder addResources(String transferUrlPattern) throws Exception {
+        String pid = metsDocument.getRootElement().getAttributeValue("OBJID");
+        if (pid != null && !pid.isEmpty()) {
+            valuesMap.put("PID", pid);
+        }
+
         @SuppressWarnings("unchecked")
         List<Element> fileElements = XPATH_FILE.evaluate(metsDocument);
         for (Element fileElement : fileElements) {
+            String dsid = fileElement.getAttributeValue("ID");
+            if (dsid != null && !dsid.isEmpty()) {
+                valuesMap.put("DSID", dsid);
+            }
+
+            String transferUrl;
+            if (transferUrlPattern != null && !transferUrlPattern.isEmpty()) {
+                transferUrl = substitutor.replace(transferUrlPattern);
+            } else {
+                transferUrl = extractTransferUrl(fileElement);
+            }
+
             resources.add(resourceType(
-                    identifierType(extractTransferUrl(fileElement)),
+                    identifierType(transferUrl),
                     formatType(extractMimetype(fileElement))));
         }
         return this;

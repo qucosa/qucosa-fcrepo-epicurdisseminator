@@ -30,6 +30,7 @@ import org.jdom2.input.SAXBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -46,6 +47,7 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
 
 public class EpicurDisseminationServlet extends HttpServlet {
 
+    private static final String PARAM_TRANSFER_URL_PATTERN = "transfer.url.pattern";
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     private CloseableHttpClient httpClient;
     private JAXBContext jaxbContext;
@@ -85,6 +87,12 @@ public class EpicurDisseminationServlet extends HttpServlet {
             }
             URI metsDocumentUri = URI.create(reqParameter);
 
+            ServletConfig config = getServletConfig();
+            String transferUrlPattern = config.getServletContext().getInitParameter(PARAM_TRANSFER_URL_PATTERN);
+            if (transferUrlPattern == null || transferUrlPattern.isEmpty()) {
+                transferUrlPattern = System.getProperty(PARAM_TRANSFER_URL_PATTERN);
+            }
+
             httpResponse = httpClient.execute(new HttpGet(metsDocumentUri));
             if (httpResponse.getStatusLine().getStatusCode() != SC_OK) {
                 resp.sendError(
@@ -98,7 +106,7 @@ public class EpicurDisseminationServlet extends HttpServlet {
                     .buildAdministrativeDataSection(UpdateStatus.urn_new)
                     .addRecord(new EpicurRecordBuilder(metsDocument)
                             .addIdentifier()
-                            .addResources()
+                            .addResources(transferUrlPattern)
                             .build());
 
             Epicur epicur = epicurBuilder.build();

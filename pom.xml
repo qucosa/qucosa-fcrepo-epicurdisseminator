@@ -66,6 +66,13 @@
             <version>1.1.6</version>
         </dependency>
 
+        <!-- String substitution for URL pattern configuration -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.3.2</version>
+        </dependency>
+
     </dependencies>
 
     <build>
