@@ -20,6 +20,7 @@ import de.dnb.xepicur.Epicur;
 import de.qucosa.dissemination.epicur.model.EpicurBuilder;
 import de.qucosa.dissemination.epicur.model.EpicurRecordBuilder;
 import de.qucosa.dissemination.epicur.model.UpdateStatus;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -48,6 +49,8 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
 public class EpicurDisseminationServlet extends HttpServlet {
 
     private static final String PARAM_TRANSFER_URL_PATTERN = "transfer.url.pattern";
+    private static final String PARAM_TRANSFER_URL_PIDENCODE = "transfer.url.pidencode";
+    private static final String PARAM_METS_URL = "metsurl";
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     private CloseableHttpClient httpClient;
     private Marshaller marshaller;
@@ -77,20 +80,30 @@ public class EpicurDisseminationServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         URI metsDocumentUri;
+        boolean transferUrlPidencode;
         String transferUrlPattern;
         try {
-            String reqParameter = req.getParameter("metsurl");
+            String reqParameter = req.getParameter(PARAM_METS_URL);
             if (reqParameter == null || reqParameter.isEmpty()) {
-                resp.sendError(SC_BAD_REQUEST, "Missing 'metsurl' parameter");
+                resp.sendError(SC_BAD_REQUEST, "Missing parameter '" + PARAM_METS_URL + "'");
                 return;
             }
             metsDocumentUri = URI.create(reqParameter);
 
             ServletConfig config = getServletConfig();
+
             transferUrlPattern = config.getServletContext().getInitParameter(PARAM_TRANSFER_URL_PATTERN);
             if (transferUrlPattern == null || transferUrlPattern.isEmpty()) {
                 transferUrlPattern = System.getProperty(PARAM_TRANSFER_URL_PATTERN);
             }
+
+            String p = config.getServletContext().getInitParameter(PARAM_TRANSFER_URL_PIDENCODE);
+            if (p == null || p.isEmpty()) {
+                transferUrlPidencode = (System.getProperty(PARAM_TRANSFER_URL_PIDENCODE) != null);
+            } else {
+                transferUrlPidencode = !p.isEmpty();
+            }
+
         } catch (Exception e) {
             log.error(e.getMessage());
             resp.sendError(SC_INTERNAL_SERVER_ERROR);
@@ -110,7 +123,7 @@ public class EpicurDisseminationServlet extends HttpServlet {
                     .buildAdministrativeDataSection(UpdateStatus.urn_new)
                     .addRecord(new EpicurRecordBuilder(metsDocument)
                             .addIdentifier()
-                            .addResources(transferUrlPattern)
+                            .addResources(transferUrlPattern, transferUrlPidencode)
                             .build());
 
             Epicur epicur = epicurBuilder.build();

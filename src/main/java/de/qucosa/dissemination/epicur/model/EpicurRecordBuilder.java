@@ -12,6 +12,7 @@ import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -56,9 +57,12 @@ public class EpicurRecordBuilder {
         return this;
     }
 
-    public EpicurRecordBuilder addResources(String transferUrlPattern) throws Exception {
+    public EpicurRecordBuilder addResources(String transferUrlPattern, boolean transferUrlPidencode) throws Exception {
         String pid = metsDocument.getRootElement().getAttributeValue("OBJID");
         if (pid != null && !pid.isEmpty()) {
+            if (transferUrlPidencode) {
+                pid = URLEncoder.encode(pid, "UTF-8");
+            }
             valuesMap.put("PID", pid);
         }
 
