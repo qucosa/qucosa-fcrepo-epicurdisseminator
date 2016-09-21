@@ -50,14 +50,12 @@ public class EpicurDisseminationServlet extends HttpServlet {
     private static final String PARAM_TRANSFER_URL_PATTERN = "transfer.url.pattern";
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     private CloseableHttpClient httpClient;
-    private JAXBContext jaxbContext;
     private Marshaller marshaller;
 
     @Override
     public void init() throws ServletException {
         try {
-            jaxbContext = JAXBContext.newInstance(Epicur.class);
-            marshaller = jaxbContext.createMarshaller();
+            marshaller = JAXBContext.newInstance(Epicur.class).createMarshaller();
             httpClient = HttpClientBuilder
                     .create()
                     .setConnectionManager(new PoolingHttpClientConnectionManager())
@@ -78,22 +76,28 @@ public class EpicurDisseminationServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        CloseableHttpResponse httpResponse = null;
+        URI metsDocumentUri;
+        String transferUrlPattern;
         try {
             String reqParameter = req.getParameter("metsurl");
             if (reqParameter == null || reqParameter.isEmpty()) {
                 resp.sendError(SC_BAD_REQUEST, "Missing 'metsurl' parameter");
                 return;
             }
-            URI metsDocumentUri = URI.create(reqParameter);
+            metsDocumentUri = URI.create(reqParameter);
 
             ServletConfig config = getServletConfig();
-            String transferUrlPattern = config.getServletContext().getInitParameter(PARAM_TRANSFER_URL_PATTERN);
+            transferUrlPattern = config.getServletContext().getInitParameter(PARAM_TRANSFER_URL_PATTERN);
             if (transferUrlPattern == null || transferUrlPattern.isEmpty()) {
                 transferUrlPattern = System.getProperty(PARAM_TRANSFER_URL_PATTERN);
             }
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            resp.sendError(SC_INTERNAL_SERVER_ERROR);
+            return;
+        }
 
-            httpResponse = httpClient.execute(new HttpGet(metsDocumentUri));
+        try (CloseableHttpResponse httpResponse = httpClient.execute(new HttpGet(metsDocumentUri))) {
             if (httpResponse.getStatusLine().getStatusCode() != SC_OK) {
                 resp.sendError(
                         httpResponse.getStatusLine().getStatusCode(),
@@ -115,12 +119,6 @@ public class EpicurDisseminationServlet extends HttpServlet {
         } catch (Exception e) {
             log.error(e.getMessage());
             resp.sendError(SC_INTERNAL_SERVER_ERROR);
-        } finally {
-            if (httpResponse != null) try {
-                httpResponse.close();
-            } catch (Exception ignored) {
-            }
         }
     }
-
 }
