@@ -31,7 +31,7 @@ public class EpicurBuilder {
     }
 
     public Epicur build() {
-        return epicur;
+        return epicurInstance();
     }
 
     private Epicur epicurInstance() {
