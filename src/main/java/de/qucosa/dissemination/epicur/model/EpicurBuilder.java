@@ -3,14 +3,58 @@ package de.qucosa.dissemination.epicur.model;
 import de.dnb.xepicur.AdministrativeDataType;
 import de.dnb.xepicur.DeliveryType;
 import de.dnb.xepicur.Epicur;
-import de.dnb.xepicur.RecordType;
 import de.dnb.xepicur.UpdateStatusType;
+import org.jdom2.Document;
 
 public class EpicurBuilder {
 
-    private Epicur epicur;
+    private boolean encodePid = false;
+    private String frontdoorUrlPattern;
+    private Document metsDocument;
+    private String transferUrlPattern;
+    private UpdateStatus updateStatus = UpdateStatus.urn_new;
 
-    public EpicurBuilder buildAdministrativeDataSection(UpdateStatus updateStatus) {
+    public EpicurBuilder transferUrlPattern(String pattern) {
+        transferUrlPattern = pattern;
+        return this;
+    }
+
+    public EpicurBuilder frontdoorUrlPattern(String pattern) {
+        frontdoorUrlPattern = pattern;
+        return this;
+    }
+
+    public EpicurBuilder encodePid(boolean encode) {
+        encodePid = encode;
+        return this;
+    }
+
+    public EpicurBuilder updateStatus(UpdateStatus status) {
+        updateStatus = status;
+        return this;
+    }
+
+    public EpicurBuilder mets(Document document) {
+        metsDocument = document;
+        return this;
+    }
+
+    public Epicur build() throws Exception {
+        if (metsDocument == null) {
+            throw new EpicurBuilderException("No METS document set");
+        }
+
+        Epicur epicur = new Epicur();
+        epicur.getRecord().add(
+                new EpicurRecordBuilder(metsDocument)
+                        .addIdentifier()
+                        .addResources(transferUrlPattern, frontdoorUrlPattern, encodePid)
+                        .build());
+        buildAdministrativeDataSection(epicur, updateStatus);
+        return epicur;
+    }
+
+    private void buildAdministrativeDataSection(Epicur epicur, UpdateStatus updateStatus) {
         UpdateStatusType updateStatusType = new UpdateStatusType();
         updateStatusType.setType(updateStatus.name());
 
@@ -20,25 +64,7 @@ public class EpicurBuilder {
         AdministrativeDataType administrativeDataType = new AdministrativeDataType();
         administrativeDataType.setDelivery(deliveryType);
 
-        epicurInstance().setAdministrativeData(administrativeDataType);
-
-        return this;
-    }
-
-    public EpicurBuilder addRecord(RecordType record) {
-        epicurInstance().getRecord().add(record);
-        return this;
-    }
-
-    public Epicur build() {
-        return epicurInstance();
-    }
-
-    private Epicur epicurInstance() {
-        if (epicur == null) {
-            epicur = new Epicur();
-        }
-        return epicur;
+        epicur.setAdministrativeData(administrativeDataType);
     }
 
 }

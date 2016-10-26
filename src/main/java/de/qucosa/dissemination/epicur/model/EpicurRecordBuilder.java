@@ -18,7 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class EpicurRecordBuilder {
+class EpicurRecordBuilder {
     private static final Namespace MODS = Namespace.getNamespace("mods", "http://www.loc.gov/mods/v3");
     private static final Namespace METS = Namespace.getNamespace("mets", "http://www.loc.gov/METS/");
     private static final Namespace XLINK = Namespace.getNamespace("xlink", "http://www.w3.org/1999/xlink");

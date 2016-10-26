@@ -18,7 +18,6 @@ package de.qucosa.dissemination.epicur.servlet;
 
 import de.dnb.xepicur.Epicur;
 import de.qucosa.dissemination.epicur.model.EpicurBuilder;
-import de.qucosa.dissemination.epicur.model.EpicurRecordBuilder;
 import de.qucosa.dissemination.epicur.model.UpdateStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -112,11 +111,11 @@ public class EpicurDisseminationServlet extends HttpServlet {
             Document metsDocument = new SAXBuilder().build(httpResponse.getEntity().getContent());
 
             EpicurBuilder epicurBuilder = new EpicurBuilder()
-                    .buildAdministrativeDataSection(UpdateStatus.urn_new)
-                    .addRecord(new EpicurRecordBuilder(metsDocument)
-                            .addIdentifier()
-                            .addResources(transferUrlPattern, frontpageUrlPattern, transferUrlPidencode)
-                            .build());
+                    .encodePid(transferUrlPidencode)
+                    .frontdoorUrlPattern(frontpageUrlPattern)
+                    .mets(metsDocument)
+                    .transferUrlPattern(transferUrlPattern)
+                    .updateStatus(UpdateStatus.urn_new);
 
             Epicur epicur = epicurBuilder.build();
 

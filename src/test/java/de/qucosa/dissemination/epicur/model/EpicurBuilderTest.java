@@ -16,18 +16,21 @@ import static org.junit.Assert.assertNotNull;
 public class EpicurBuilderTest extends XmlTestsupport {
 
     @Test
-    public void Build_bare_epicur_dissemination_without_exceptions() {
+    public void Build_bare_epicur_dissemination_without_exceptions() throws Exception {
         EpicurBuilder epicurBuilder = new EpicurBuilder();
-        Epicur epicur = epicurBuilder.build();
+        Epicur epicur = epicurBuilder
+                .mets(buildMetsDocument("4711", "urn:nbn:de:foo-4711"))
+                .build();
         assertNotNull(epicur);
     }
 
     @Test
-    public void Administrative_section_contains_update_status() {
-        EpicurBuilder epicurBuilder = new EpicurBuilder();
-        epicurBuilder.buildAdministrativeDataSection(UpdateStatus.urn_new);
-
-        Epicur epicur = epicurBuilder.build();
+    public void Administrative_section_contains_update_status() throws Exception {
+        EpicurBuilder epicurBuilder = new EpicurBuilder()
+                .updateStatus(UpdateStatus.urn_new);
+        Epicur epicur = epicurBuilder
+                .mets(buildMetsDocument("4711", "urn:nbn:de:foo-4711"))
+                .build();
 
         UpdateStatusType updateStatusType = epicur.getAdministrativeData().getDelivery().getUpdateStatus();
         assertEquals(UpdateStatus.urn_new.name(), updateStatusType.getType());
@@ -39,8 +42,8 @@ public class EpicurBuilderTest extends XmlTestsupport {
         String urn = scheme + ":foo-4711";
         String pid = "foo:4711";
         Document metsDocument = buildMetsDocument(pid, urn);
-        EpicurBuilder epicurBuilder = new EpicurBuilder();
-        epicurBuilder.addRecord(new EpicurRecordBuilder(metsDocument).addIdentifier().build());
+        EpicurBuilder epicurBuilder = new EpicurBuilder()
+                .mets(metsDocument);
 
         Epicur epicur = epicurBuilder.build();
 
@@ -51,18 +54,16 @@ public class EpicurBuilderTest extends XmlTestsupport {
 
     @Test
     public void Record_has_frontpage_resource_identifier() throws Exception {
+        String origin = "original";
+        String pid = "foo:4711";
+        String role = "primary";
         String scheme = "url";
         String type = "frontpage";
-        String role = "primary";
-        String origin = "original";
         String url = "http://example.com/id/";
-        String pid = "foo:4711";
         Document metsDocument = buildMetsDocument(pid, "urn:some:foo");
-        EpicurBuilder epicurBuilder = new EpicurBuilder();
-        epicurBuilder.addRecord(new EpicurRecordBuilder(metsDocument)
-                .addIdentifier()
-                .addResources(null, url + "##PID##", false)
-                .build());
+        EpicurBuilder epicurBuilder = new EpicurBuilder()
+                .frontdoorUrlPattern(url + "##PID##")
+                .mets(metsDocument);
 
         Epicur epicur = epicurBuilder.build();
 
