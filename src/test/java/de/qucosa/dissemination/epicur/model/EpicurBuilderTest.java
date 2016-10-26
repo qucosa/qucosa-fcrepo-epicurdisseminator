@@ -62,7 +62,7 @@ public class EpicurBuilderTest extends XmlTestsupport {
         String url = "http://example.com/id/";
         Document metsDocument = buildMetsDocument(pid, "urn:some:foo");
         EpicurBuilder epicurBuilder = new EpicurBuilder()
-                .frontdoorUrlPattern(url + "##PID##")
+                .frontpageUrlPattern(url + "##PID##")
                 .mets(metsDocument);
 
         Epicur epicur = epicurBuilder.build();

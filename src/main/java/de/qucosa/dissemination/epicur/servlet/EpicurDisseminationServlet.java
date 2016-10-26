@@ -112,7 +112,7 @@ public class EpicurDisseminationServlet extends HttpServlet {
 
             EpicurBuilder epicurBuilder = new EpicurBuilder()
                     .encodePid(transferUrlPidencode)
-                    .frontdoorUrlPattern(frontpageUrlPattern)
+                    .frontpageUrlPattern(frontpageUrlPattern)
                     .mets(metsDocument)
                     .transferUrlPattern(transferUrlPattern)
                     .updateStatus(UpdateStatus.urn_new);
