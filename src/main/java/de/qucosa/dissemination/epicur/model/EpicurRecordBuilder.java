@@ -57,13 +57,20 @@ public class EpicurRecordBuilder {
         return this;
     }
 
-    public EpicurRecordBuilder addResources(String transferUrlPattern, boolean transferUrlPidencode) throws Exception {
+    public EpicurRecordBuilder addResources(String transferUrlPattern, String frontpageUrlPattern, boolean encodePid) throws Exception {
         String pid = metsDocument.getRootElement().getAttributeValue("OBJID");
         if (pid != null && !pid.isEmpty()) {
-            if (transferUrlPidencode) {
+            if (encodePid) {
                 pid = URLEncoder.encode(pid, "UTF-8");
             }
             valuesMap.put("PID", pid);
+        }
+
+        if (frontpageUrlPattern != null && !frontpageUrlPattern.isEmpty()) {
+            String frontpageUrl = substitutor.replace(frontpageUrlPattern);
+            resources.add(resourceType(
+                    identifierFrontpageType(frontpageUrl),
+                    formatType("text/html")));
         }
 
         @SuppressWarnings("unchecked")
@@ -82,7 +89,7 @@ public class EpicurRecordBuilder {
             }
 
             resources.add(resourceType(
-                    identifierType(transferUrl),
+                    identifierTransferTargetType(transferUrl),
                     formatType(extractMimetype(fileElement))));
         }
         return this;
@@ -108,9 +115,9 @@ public class EpicurRecordBuilder {
         return href;
     }
 
-    private ResourceType resourceType(IdentifierType fileIdentifier, FormatType formatType) {
+    private ResourceType resourceType(IdentifierType identifierType, FormatType formatType) {
         ResourceType resourceType = new ResourceType();
-        resourceType.getIdentifierAndFormat().add(fileIdentifier);
+        resourceType.getIdentifierAndFormat().add(identifierType);
         resourceType.getIdentifierAndFormat().add(formatType);
         return resourceType;
     }
@@ -122,13 +129,23 @@ public class EpicurRecordBuilder {
         return formatType;
     }
 
-    private IdentifierType identifierType(String transferUrl) {
+    private IdentifierType identifierTransferTargetType(String transferUrl) {
         IdentifierType fileIdentifier = new IdentifierType();
         fileIdentifier.setScheme("url");
         fileIdentifier.setTarget("transfer");
         fileIdentifier.setOrigin("original");
         fileIdentifier.setValue(transferUrl);
         return fileIdentifier;
+    }
+
+    private IdentifierType identifierFrontpageType(String frontpageUrl) {
+        IdentifierType frontpageIdentifier = new IdentifierType();
+        frontpageIdentifier.setScheme("url");
+        frontpageIdentifier.setType("frontpage");
+        frontpageIdentifier.setRole("primary");
+        frontpageIdentifier.setOrigin("original");
+        frontpageIdentifier.setValue(frontpageUrl);
+        return frontpageIdentifier;
     }
 
 

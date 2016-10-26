@@ -20,7 +20,6 @@ import de.dnb.xepicur.Epicur;
 import de.qucosa.dissemination.epicur.model.EpicurBuilder;
 import de.qucosa.dissemination.epicur.model.EpicurRecordBuilder;
 import de.qucosa.dissemination.epicur.model.UpdateStatus;
-import org.apache.commons.lang3.BooleanUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -47,10 +46,10 @@ import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 
 public class EpicurDisseminationServlet extends HttpServlet {
-
+    private static final String PARAM_FRONTPAGE_URL_PATTERN = "frontpage.url.pattern";
+    private static final String REQUEST_PARAM_METS_URL = "metsurl";
     private static final String PARAM_TRANSFER_URL_PATTERN = "transfer.url.pattern";
     private static final String PARAM_TRANSFER_URL_PIDENCODE = "transfer.url.pidencode";
-    private static final String PARAM_METS_URL = "metsurl";
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     private CloseableHttpClient httpClient;
     private Marshaller marshaller;
@@ -82,27 +81,20 @@ public class EpicurDisseminationServlet extends HttpServlet {
         URI metsDocumentUri;
         boolean transferUrlPidencode;
         String transferUrlPattern;
+        String frontpageUrlPattern;
         try {
-            String reqParameter = req.getParameter(PARAM_METS_URL);
+            String reqParameter = req.getParameter(REQUEST_PARAM_METS_URL);
             if (reqParameter == null || reqParameter.isEmpty()) {
-                resp.sendError(SC_BAD_REQUEST, "Missing parameter '" + PARAM_METS_URL + "'");
+                resp.sendError(SC_BAD_REQUEST, "Missing parameter '" + REQUEST_PARAM_METS_URL + "'");
                 return;
             }
             metsDocumentUri = URI.create(reqParameter);
 
             ServletConfig config = getServletConfig();
 
-            transferUrlPattern = config.getServletContext().getInitParameter(PARAM_TRANSFER_URL_PATTERN);
-            if (transferUrlPattern == null || transferUrlPattern.isEmpty()) {
-                transferUrlPattern = System.getProperty(PARAM_TRANSFER_URL_PATTERN);
-            }
-
-            String p = config.getServletContext().getInitParameter(PARAM_TRANSFER_URL_PIDENCODE);
-            if (p == null || p.isEmpty()) {
-                transferUrlPidencode = (System.getProperty(PARAM_TRANSFER_URL_PIDENCODE) != null);
-            } else {
-                transferUrlPidencode = !p.isEmpty();
-            }
+            transferUrlPattern = getParameterValue(config, PARAM_TRANSFER_URL_PATTERN);
+            frontpageUrlPattern = getParameterValue(config, PARAM_FRONTPAGE_URL_PATTERN);
+            transferUrlPidencode = isParameterSet(config, PARAM_TRANSFER_URL_PIDENCODE);
 
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -123,7 +115,7 @@ public class EpicurDisseminationServlet extends HttpServlet {
                     .buildAdministrativeDataSection(UpdateStatus.urn_new)
                     .addRecord(new EpicurRecordBuilder(metsDocument)
                             .addIdentifier()
-                            .addResources(transferUrlPattern, transferUrlPidencode)
+                            .addResources(transferUrlPattern, frontpageUrlPattern, transferUrlPidencode)
                             .build());
 
             Epicur epicur = epicurBuilder.build();
@@ -133,5 +125,24 @@ public class EpicurDisseminationServlet extends HttpServlet {
             log.error(e.getMessage());
             resp.sendError(SC_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    private boolean isParameterSet(ServletConfig config, String name) {
+        boolean b;
+        String p = config.getServletContext().getInitParameter(name);
+        if (p == null || p.isEmpty()) {
+            b = (System.getProperty(name) != null);
+        } else {
+            b = !p.isEmpty();
+        }
+        return b;
+    }
+
+    private String getParameterValue(ServletConfig config, String name) {
+        String v = config.getServletContext().getInitParameter(name);
+        if (v == null || v.isEmpty()) {
+            v = System.getProperty(name);
+        }
+        return v;
     }
 }

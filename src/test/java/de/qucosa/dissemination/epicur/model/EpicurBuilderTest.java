@@ -37,7 +37,8 @@ public class EpicurBuilderTest extends XmlTestsupport {
     public void Record_with_transfer_identifier_has_qucosa_URN() throws Exception {
         String scheme = "urn:nbn:de";
         String urn = scheme + ":foo-4711";
-        Document metsDocument = buildMetsDocument(urn);
+        String pid = "foo:4711";
+        Document metsDocument = buildMetsDocument(pid, urn);
         EpicurBuilder epicurBuilder = new EpicurBuilder();
         epicurBuilder.addRecord(new EpicurRecordBuilder(metsDocument).addIdentifier().build());
 
@@ -48,10 +49,33 @@ public class EpicurBuilderTest extends XmlTestsupport {
                 marshal(epicur));
     }
 
-    private Document buildMetsDocument(String urn) throws Exception {
+    @Test
+    public void Record_has_frontpage_resource_identifier() throws Exception {
+        String scheme = "url";
+        String type = "frontpage";
+        String role = "primary";
+        String origin = "original";
+        String url = "http://example.com/id/";
+        String pid = "foo:4711";
+        Document metsDocument = buildMetsDocument(pid, "urn:some:foo");
+        EpicurBuilder epicurBuilder = new EpicurBuilder();
+        epicurBuilder.addRecord(new EpicurRecordBuilder(metsDocument)
+                .addIdentifier()
+                .addResources(null, url + "##PID##", false)
+                .build());
+
+        Epicur epicur = epicurBuilder.build();
+
+        XMLAssert.assertXpathExists(
+                String.format("//e:record/e:resource/e:identifier[@scheme='%s' and @type='%s' and @role='%s' and @origin='%s'" +
+                                " and text()='%s']",
+                        scheme, type, role, origin, url + pid), marshal(epicur));
+    }
+
+    private Document buildMetsDocument(String pid, String urn) throws Exception {
         String mods = buildModsDocument(urn);
         String xml =
-                "<m:mets xmlns:m=\"http://www.loc.gov/METS/\">" +
+                "<m:mets OBJID=\"" + pid + "\" xmlns:m=\"http://www.loc.gov/METS/\">" +
                         "<m:dmdSec>" +
                         "<m:mdWrap MDTYPE=\"MODS\">" +
                         "<m:xmlData>" +
