@@ -49,6 +49,8 @@ public class EpicurDisseminationServlet extends HttpServlet {
     private static final String REQUEST_PARAM_METS_URL = "metsurl";
     private static final String PARAM_TRANSFER_URL_PATTERN = "transfer.url.pattern";
     private static final String PARAM_TRANSFER_URL_PIDENCODE = "transfer.url.pidencode";
+    private static final String XEPICUR_SCHEMA_LOCATION =
+            "urn:nbn:de:1111-2004033116 http://www.persistent-identifier.de/xepicur/version1.0/xepicur.xsd";
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     private CloseableHttpClient httpClient;
     private Marshaller marshaller;
@@ -57,6 +59,7 @@ public class EpicurDisseminationServlet extends HttpServlet {
     public void init() throws ServletException {
         try {
             marshaller = JAXBContext.newInstance(Epicur.class).createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, XEPICUR_SCHEMA_LOCATION);
             httpClient = HttpClientBuilder
                     .create()
                     .setConnectionManager(new PoolingHttpClientConnectionManager())
