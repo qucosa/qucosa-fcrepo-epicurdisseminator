@@ -35,6 +35,8 @@ public class EpicurBuilder {
             .compile("//mods:mods/mods:identifier[@type='urn']", Filters.fpassthrough(), null, MODS);
     private static final XPathExpression XPATH_FILE = XPathFactory.instance()
             .compile("//mets:fileGrp[@USE='DOWNLOAD']/mets:file", Filters.fpassthrough(), null, METS);
+    private static final XPathExpression XPATH_AGENT = XPathFactory.instance()
+            .compile("//mets:agent[@ROLE='EDITOR' and @TYPE='ORGANIZATION']/mets:name", Filters.fpassthrough(), null, METS);
 
     private boolean encodePid = false;
     private String frontpageUrlPattern;
@@ -115,6 +117,9 @@ public class EpicurBuilder {
 
         String pid = extractObjectPID(metsDocument);
         if (pid != null && !pid.isEmpty()) valuesMap.put("PID", pid);
+
+        String agent = extractAgentName(metsDocument);
+        if (agent != null && !agent.isEmpty()) valuesMap.put("AGENT", agent);
 
         if (frontpageUrlPattern != null && !frontpageUrlPattern.isEmpty()) {
             String frontpageUrl = substitutor.replace(frontpageUrlPattern);
@@ -209,6 +214,14 @@ public class EpicurBuilder {
             }
         }
         return pid;
+    }
+
+    private String extractAgentName(Document metsDocument) {
+        Element agentNameElement = (Element) XPATH_AGENT.evaluateFirst(metsDocument);
+        if (agentNameElement != null) {
+            return agentNameElement.getTextTrim();
+        }
+        return null;
     }
 
     private AdministrativeDataType constructAdministrativeDataSection(UpdateStatus updateStatus) {
