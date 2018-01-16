@@ -39,6 +39,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.StringWriter;
 import java.net.URI;
 import java.nio.charset.Charset;
 
@@ -123,13 +124,20 @@ public class EpicurDisseminationServlet extends HttpServlet {
                     .updateStatus(UpdateStatus.urn_new);
             Epicur epicur = epicurBuilder.build();
 
+            StringWriter stringWriter = new StringWriter();
+            marshaller.marshal(epicur, stringWriter);
+
             resp.setCharacterEncoding(Charset.defaultCharset().name());
             resp.setContentType("application/xml");
-            marshaller.marshal(epicur, new OutputStreamWriter(resp.getOutputStream()));
+            resp.getOutputStream().print(stringWriter.toString());
 
         } catch (Exception e) {
-            log.error(e.getMessage());
-            resp.sendError(SC_INTERNAL_SERVER_ERROR);
+            log.error("Error while writing XML content: " + e.getMessage());
+            if (!resp.isCommitted()) {
+                resp.sendError(SC_INTERNAL_SERVER_ERROR);
+            } else {
+                log.warn("Response already committed. Cannot send error code.");
+            }
         }
     }
 
