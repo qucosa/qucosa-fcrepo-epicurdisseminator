@@ -142,14 +142,9 @@ public class EpicurDisseminationServlet extends HttpServlet {
     }
 
     private boolean isParameterSet(ServletConfig config, String name) {
-        boolean b;
         String p = config.getServletContext().getInitParameter(name);
-        if (p == null || p.isEmpty()) {
-            b = (System.getProperty(name) != null);
-        } else {
-            b = !p.isEmpty();
-        }
-        return b;
+        return p != null
+                && !p.isEmpty() || (System.getProperty(name) != null);
     }
 
     private String getParameterValue(ServletConfig config, String name) {
