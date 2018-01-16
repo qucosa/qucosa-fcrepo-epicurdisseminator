@@ -38,7 +38,9 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.net.URI;
+import java.nio.charset.Charset;
 
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
@@ -119,10 +121,12 @@ public class EpicurDisseminationServlet extends HttpServlet {
                     .mets(metsDocument)
                     .transferUrlPattern(transferUrlPattern)
                     .updateStatus(UpdateStatus.urn_new);
-
             Epicur epicur = epicurBuilder.build();
 
-            marshaller.marshal(epicur, resp.getWriter());
+            resp.setCharacterEncoding(Charset.defaultCharset().name());
+            resp.setContentType("application/xml");
+            marshaller.marshal(epicur, new OutputStreamWriter(resp.getOutputStream()));
+
         } catch (Exception e) {
             log.error(e.getMessage());
             resp.sendError(SC_INTERNAL_SERVER_ERROR);
