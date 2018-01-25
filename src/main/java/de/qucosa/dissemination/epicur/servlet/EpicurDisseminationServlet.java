@@ -42,7 +42,9 @@ import java.io.StringWriter;
 import java.net.URI;
 import java.nio.charset.Charset;
 
-import static javax.servlet.http.HttpServletResponse.*;
+import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+import static javax.servlet.http.HttpServletResponse.SC_OK;
 
 public class EpicurDisseminationServlet extends HttpServlet {
     private static final String PARAM_FRONTPAGE_URL_PATTERN = "frontpage.url.pattern";
@@ -54,12 +56,15 @@ public class EpicurDisseminationServlet extends HttpServlet {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
 
-    private ThreadLocal<CloseableHttpClient> threadLocalHttpClient;
+    private CloseableHttpClient httpClient;
     private ThreadLocal<Marshaller> threadLocalMarshaller;
-    private PoolingHttpClientConnectionManager poolingHttpClientConnectionManager;
 
     @Override
     public void init() throws ServletException {
+        httpClient = HttpClientBuilder.create()
+                .setConnectionManager(new PoolingHttpClientConnectionManager())
+                .build();
+
         try {
 
             threadLocalMarshaller = new ThreadLocal<Marshaller>() {
@@ -75,16 +80,7 @@ public class EpicurDisseminationServlet extends HttpServlet {
                 }
             };
 
-            poolingHttpClientConnectionManager = new PoolingHttpClientConnectionManager();
 
-            threadLocalHttpClient = new ThreadLocal<CloseableHttpClient>() {
-                @Override
-                protected CloseableHttpClient initialValue() {
-                    return HttpClientBuilder.create()
-                            .setConnectionManager(poolingHttpClientConnectionManager)
-                            .build();
-                }
-            };
 
         } catch (Exception e) {
             throw new ServletException("Failed to initialize servlet", e);
@@ -94,7 +90,7 @@ public class EpicurDisseminationServlet extends HttpServlet {
     @Override
     public void destroy() {
         try {
-            threadLocalHttpClient.get().close();
+            httpClient.close();
         } catch (IOException e) {
             log.warn("Error closing HTTP client: " + e.getMessage());
         }
@@ -126,7 +122,7 @@ public class EpicurDisseminationServlet extends HttpServlet {
             return;
         }
 
-        try (CloseableHttpResponse httpResponse = threadLocalHttpClient.get().execute(new HttpGet(metsDocumentUri))) {
+        try (CloseableHttpResponse httpResponse = httpClient.execute(new HttpGet(metsDocumentUri))) {
             if (httpResponse.getStatusLine().getStatusCode() != SC_OK) {
                 resp.sendError(
                         httpResponse.getStatusLine().getStatusCode(),
