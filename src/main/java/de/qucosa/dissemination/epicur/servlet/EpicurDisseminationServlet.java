@@ -19,6 +19,10 @@ package de.qucosa.dissemination.epicur.servlet;
 import de.dnb.xepicur.Epicur;
 import de.qucosa.dissemination.epicur.model.EpicurBuilder;
 import de.qucosa.dissemination.epicur.model.UpdateStatus;
+import org.apache.commons.pool2.BasePooledObjectFactory;
+import org.apache.commons.pool2.PooledObject;
+import org.apache.commons.pool2.impl.DefaultPooledObject;
+import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -30,19 +34,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URI;
 import java.nio.charset.Charset;
 
-import static javax.servlet.http.HttpServletResponse.*;
+import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+import static javax.servlet.http.HttpServletResponse.SC_OK;
 
 public class EpicurDisseminationServlet extends HttpServlet {
     private static final String PARAM_FRONTPAGE_URL_PATTERN = "frontpage.url.pattern";
@@ -53,51 +57,39 @@ public class EpicurDisseminationServlet extends HttpServlet {
             "urn:nbn:de:1111-2004033116 http://www.persistent-identifier.de/xepicur/version1.0/xepicur.xsd";
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-
-    private ThreadLocal<CloseableHttpClient> threadLocalHttpClient;
-    private ThreadLocal<Marshaller> threadLocalMarshaller;
-    private PoolingHttpClientConnectionManager poolingHttpClientConnectionManager;
+    private CloseableHttpClient httpClient;
+    private GenericObjectPool<Marshaller> marshallerPool;
 
     @Override
-    public void init() throws ServletException {
-        try {
+    public void init() {
+        httpClient = HttpClientBuilder.create()
+                .setConnectionManager(new PoolingHttpClientConnectionManager())
+                .build();
 
-            threadLocalMarshaller = new ThreadLocal<Marshaller>() {
-                @Override
-                protected Marshaller initialValue() {
-                    try {
-                        Marshaller marshaller = JAXBContext.newInstance(Epicur.class).createMarshaller();
-                        marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, XEPICUR_SCHEMA_LOCATION);
-                        return marshaller;
-                    } catch (JAXBException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            };
+        marshallerPool = new GenericObjectPool<>(new BasePooledObjectFactory<Marshaller>() {
+            @Override
+            public Marshaller create() throws Exception {
+                Marshaller marshaller = JAXBContext.newInstance(Epicur.class).createMarshaller();
+                marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, XEPICUR_SCHEMA_LOCATION);
+                return marshaller;
+            }
 
-            poolingHttpClientConnectionManager = new PoolingHttpClientConnectionManager();
-
-            threadLocalHttpClient = new ThreadLocal<CloseableHttpClient>() {
-                @Override
-                protected CloseableHttpClient initialValue() {
-                    return HttpClientBuilder.create()
-                            .setConnectionManager(poolingHttpClientConnectionManager)
-                            .build();
-                }
-            };
-
-        } catch (Exception e) {
-            throw new ServletException("Failed to initialize servlet", e);
-        }
+            @Override
+            public PooledObject<Marshaller> wrap(Marshaller marshaller) {
+                return new DefaultPooledObject<>(marshaller);
+            }
+        });
     }
 
     @Override
     public void destroy() {
         try {
-            threadLocalHttpClient.get().close();
+            httpClient.close();
         } catch (IOException e) {
             log.warn("Error closing HTTP client: " + e.getMessage());
         }
+
+        marshallerPool.clear();
     }
 
     @Override
@@ -126,7 +118,7 @@ public class EpicurDisseminationServlet extends HttpServlet {
             return;
         }
 
-        try (CloseableHttpResponse httpResponse = threadLocalHttpClient.get().execute(new HttpGet(metsDocumentUri))) {
+        try (CloseableHttpResponse httpResponse = httpClient.execute(new HttpGet(metsDocumentUri))) {
             if (httpResponse.getStatusLine().getStatusCode() != SC_OK) {
                 resp.sendError(
                         httpResponse.getStatusLine().getStatusCode(),
@@ -144,7 +136,10 @@ public class EpicurDisseminationServlet extends HttpServlet {
             Epicur epicur = epicurBuilder.build();
 
             StringWriter stringWriter = new StringWriter();
-            threadLocalMarshaller.get().marshal(epicur, stringWriter);
+
+            Marshaller marshaller = marshallerPool.borrowObject();
+            marshaller.marshal(epicur, stringWriter);
+            marshallerPool.returnObject(marshaller);
 
             resp.setCharacterEncoding(Charset.defaultCharset().name());
             resp.setContentType("application/xml");
