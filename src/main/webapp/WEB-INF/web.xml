@@ -42,6 +42,11 @@
         <param-value>fedoraAdmin:fedoraAdmin</param-value>
     </context-param>
 
+    <context-param>
+        <param-name>agent.substitutions</param-name>
+        <param-value>ubc=monarch ; ubl=ul</param-value>
+    </context-param>
+
     <servlet>
         <servlet-name>EpicurDisseminatorServlet</servlet-name>
         <servlet-class>de.qucosa.dissemination.epicur.servlet.EpicurDisseminationServlet</servlet-class>

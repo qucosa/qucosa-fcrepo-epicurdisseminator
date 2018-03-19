@@ -9,6 +9,8 @@ import org.jdom2.input.SAXBuilder;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -96,6 +98,33 @@ public class EpicurBuilderTest extends XmlTestsupport {
                 String.format("//e:record/e:resource/e:identifier[@scheme='%s' and @type='%s' and @role='%s' and @origin='%s'" +
                                 " and text()='%s']",
                         scheme, type, role, origin, expectedURL), marshal(epicur));
+    }
+
+    @Test
+    public void Substitutes_agent_name_in_frontpage_URL() throws Exception {
+        String agent = "agent";
+        String substituteAgent = "substitute";
+        String pid = "foo:4711";
+        Document metsDocument = buildMetsDocument(agent, pid, "urn:some:foo");
+
+        String urlPattern = "http://##AGENT##.example.com/id/##PID##";
+
+        Map<String, String> substitutions = new LinkedHashMap<>();
+        substitutions.put(agent, substituteAgent);
+
+        EpicurBuilder epicurBuilder = new EpicurBuilder()
+                .frontpageUrlPattern(urlPattern)
+                .agentNameSubstitutions(substitutions)
+                .mets(metsDocument);
+
+        Epicur epicur = epicurBuilder.build();
+
+        String expectedFrontpageURL = "http://" + substituteAgent + ".example.com/id/" + pid;
+        String xmlString = marshal(epicur);
+
+        XMLAssert.assertXpathExists(
+                String.format("//e:record/e:resource/e:identifier[@scheme='url' and @type='frontpage' and text()='%s']",
+                        expectedFrontpageURL), xmlString);
     }
 
     private Document buildMetsDocument(String agent, String pid, String urn) throws Exception {

@@ -43,6 +43,8 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
@@ -53,6 +55,7 @@ public class EpicurDisseminationServlet extends HttpServlet {
     private static final String REQUEST_PARAM_METS_URL = "metsurl";
     private static final String PARAM_TRANSFER_URL_PATTERN = "transfer.url.pattern";
     private static final String PARAM_TRANSFER_URL_PIDENCODE = "transfer.url.pidencode";
+    private static final String PARAM_AGENT_NAME_SUBSTITUTIONS = "agent.substitutions";
     private static final String XEPICUR_SCHEMA_LOCATION =
             "urn:nbn:de:1111-2004033116 http://www.persistent-identifier.de/xepicur/version1.0/xepicur.xsd";
     private final Logger log = LoggerFactory.getLogger(this.getClass());
@@ -98,6 +101,7 @@ public class EpicurDisseminationServlet extends HttpServlet {
         boolean transferUrlPidencode;
         String transferUrlPattern;
         String frontpageUrlPattern;
+        Map<String, String> agentNameSubstitutions;
         try {
             String reqParameter = req.getParameter(REQUEST_PARAM_METS_URL);
             if (reqParameter == null || reqParameter.isEmpty()) {
@@ -111,6 +115,8 @@ public class EpicurDisseminationServlet extends HttpServlet {
             transferUrlPattern = getParameterValue(config, PARAM_TRANSFER_URL_PATTERN);
             frontpageUrlPattern = getParameterValue(config, PARAM_FRONTPAGE_URL_PATTERN);
             transferUrlPidencode = isParameterSet(config, PARAM_TRANSFER_URL_PIDENCODE);
+
+            agentNameSubstitutions = decodeSubstitutions(getParameterValue(config, PARAM_AGENT_NAME_SUBSTITUTIONS));
 
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -129,6 +135,7 @@ public class EpicurDisseminationServlet extends HttpServlet {
 
             EpicurBuilder epicurBuilder = new EpicurBuilder()
                     .encodePid(transferUrlPidencode)
+                    .agentNameSubstitutions(agentNameSubstitutions)
                     .frontpageUrlPattern(frontpageUrlPattern)
                     .mets(metsDocument)
                     .transferUrlPattern(transferUrlPattern)
@@ -153,6 +160,17 @@ public class EpicurDisseminationServlet extends HttpServlet {
                 log.warn("Response already committed. Cannot send error code.");
             }
         }
+    }
+
+    private Map<String, String> decodeSubstitutions(String parameterValue) {
+        LinkedHashMap<String, String> result = new LinkedHashMap<>();
+        if (parameterValue != null && !parameterValue.isEmpty()) {
+            for (String substitution : parameterValue.split(";")) {
+                String[] s = substitution.split("=");
+                result.put(s[0].trim(), s[1].trim());
+            }
+        }
+        return result;
     }
 
     private boolean isParameterSet(ServletConfig config, String name) {
