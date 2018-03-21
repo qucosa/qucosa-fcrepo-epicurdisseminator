@@ -18,6 +18,7 @@ import org.jdom2.xpath.XPathFactory;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,6 +44,7 @@ public class EpicurBuilder {
     private Document metsDocument;
     private String transferUrlPattern;
     private UpdateStatus updateStatus = UpdateStatus.urn_new;
+    private Map<String, String> agentNameSubstitutions = Collections.emptyMap();
 
     public EpicurBuilder transferUrlPattern(String pattern) {
         transferUrlPattern = pattern;
@@ -51,6 +53,11 @@ public class EpicurBuilder {
 
     public EpicurBuilder frontpageUrlPattern(String pattern) {
         frontpageUrlPattern = pattern;
+        return this;
+    }
+
+    public EpicurBuilder agentNameSubstitutions(Map<String, String> agentNameSubstitutions) {
+        this.agentNameSubstitutions = agentNameSubstitutions;
         return this;
     }
 
@@ -219,7 +226,12 @@ public class EpicurBuilder {
     private String extractAgentName(Document metsDocument) {
         Element agentNameElement = (Element) XPATH_AGENT.evaluateFirst(metsDocument);
         if (agentNameElement != null) {
-            return agentNameElement.getTextTrim();
+            String agentName = agentNameElement.getTextTrim();
+            if (agentNameSubstitutions.containsKey(agentName)) {
+                return agentNameSubstitutions.get(agentName);
+            } else {
+                return agentName;
+            }
         }
         return null;
     }
