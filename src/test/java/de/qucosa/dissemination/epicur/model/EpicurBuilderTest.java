@@ -2,6 +2,8 @@ package de.qucosa.dissemination.epicur.model;
 
 import de.dnb.xepicur.Epicur;
 import de.dnb.xepicur.UpdateStatusType;
+import de.qucosa.dissemination.epicur.EpicurBuilder;
+import de.qucosa.dissemination.epicur.UpdateStatus;
 import de.qucosa.dissemination.epicur.testsupport.XmlTestsupport;
 import org.custommonkey.xmlunit.XMLAssert;
 import org.jdom2.Document;

@@ -1,4 +1,20 @@
-package de.qucosa.dissemination.epicur.model;
+package de.qucosa.dissemination.epicur;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang3.text.StrSubstitutor;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.Namespace;
+import org.jdom2.filter.Filters;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.xpath.XPathFactory;
 
 import de.dnb.xepicur.AdministrativeDataType;
 import de.dnb.xepicur.DeliveryType;
@@ -8,21 +24,6 @@ import de.dnb.xepicur.IdentifierType;
 import de.dnb.xepicur.RecordType;
 import de.dnb.xepicur.ResourceType;
 import de.dnb.xepicur.UpdateStatusType;
-import org.apache.commons.lang3.text.StrSubstitutor;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.Namespace;
-import org.jdom2.filter.Filters;
-import org.jdom2.xpath.XPathExpression;
-import org.jdom2.xpath.XPathFactory;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
 public class EpicurBuilder {
 
