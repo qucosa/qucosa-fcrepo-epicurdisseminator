@@ -15,10 +15,6 @@ import javax.xml.bind.Marshaller;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
 
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
@@ -32,8 +28,6 @@ import de.dnb.xepicur.Epicur;
 public class EpicurDissMapper {
     private org.jdom2.Document metsDoc = null;
     
-    private Document originalMetsDoc = null;
-
     private EpicurBuilder epicurBuilder = new EpicurBuilder();
 
     private String transferUrlPattern;
@@ -64,7 +58,6 @@ public class EpicurDissMapper {
 
     public Document transformEpicurDiss(Document metsDoc) throws JAXBException, EpicurBuilderException,
             ParserConfigurationException, UnsupportedEncodingException, SAXException, IOException, JDOMException {
-        originalMetsDoc = metsDoc;
         this.metsDoc = new SAXBuilder().build(jdom2Build(metsDoc));
         epicurBuilder
             .encodePid(transferUrlPidencode)
@@ -88,18 +81,6 @@ public class EpicurDissMapper {
 
         return epicurDoc;
     }
-    
-    public String pid() throws XPathExpressionException {
-        return extractPid();
-    }
-    
-    public String lastModeDate() throws XPathExpressionException {
-        return extractLastModDate();
-    }
-    
-    public String agent() throws XPathExpressionException {
-        return extractAgent();
-    }
 
     private InputStream jdom2Build(Document metsDoc) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -121,38 +102,5 @@ public class EpicurDissMapper {
         }
 
         return result;
-    }
-    
-    private String extractPid() throws XPathExpressionException {
-        String pid = null;
-        XPath xPath = xpath();
-        pid = (String) xPath.compile("//mets:mets/@OBJID").evaluate(originalMetsDoc, XPathConstants.STRING);
-        return pid;
-    }
-    
-    private String extractLastModDate() throws XPathExpressionException {
-        String date = null;
-        XPath xPath = xpath();
-        date = (String) xPath.compile("//mets:mets/mets:metsHdr/@LASTMODDATE").evaluate(originalMetsDoc, XPathConstants.STRING);
-        return date;
-    }
-    
-    private String extractAgent() throws XPathExpressionException {
-        String agent = null;
-        XPath xPath = xpath();
-        agent = (String) xPath.compile("//mets:agent[@ROLE='EDITOR' and @TYPE='ORGANIZATION']/mets:name[1]")
-                .evaluate(originalMetsDoc, XPathConstants.STRING);
-        return agent;
-    }
-
-    @SuppressWarnings("serial")
-    private XPath xpath() {
-        XPath xPath = XPathFactory.newInstance().newXPath();
-        xPath.setNamespaceContext(new SimpleNamespaceContext(new HashMap<String, String>() {
-            {
-                put("mets", "http://www.loc.gov/METS/");
-            }
-        }));
-        return xPath;
     }
 }
