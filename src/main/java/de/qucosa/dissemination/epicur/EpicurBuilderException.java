@@ -1,4 +1,4 @@
-package de.qucosa.dissemination.epicur.model;
+package de.qucosa.dissemination.epicur;
 
 public class EpicurBuilderException extends Exception {
     public EpicurBuilderException(String msg) {
