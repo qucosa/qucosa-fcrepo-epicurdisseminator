@@ -18,7 +18,7 @@ import org.xml.sax.SAXException;
 import de.qucosa.dissemination.epicur.EpicurBuilderException;
 import de.qucosa.dissemination.epicur.EpicurDissMapper;
 
-public class EpicurMapperTests {
+public class EpicurMapperTest {
     
     @Test
     public void mapper_Test() throws ParserConfigurationException, SAXException, IOException, JDOMException, JAXBException, EpicurBuilderException {
@@ -36,7 +36,5 @@ public class EpicurMapperTests {
         StringWriter stringWriter = new StringWriter();
         XMLSerializer serialize = new XMLSerializer(stringWriter, outputFormat);
         serialize.serialize(epicurRes);
-        
-        System.out.println(stringWriter.toString());
     }
 }
