@@ -1,0 +1,159 @@
+<mets OBJID="qucosa:48666" schemaLocation="http://www.loc.gov/METS/ http://www.loc.gov/standards/mets/mets.xsd">
+    <metsHdr CREATEDATE="2017-11-21T08:22:42.708+00:00" LASTMODDATE="2017-12-14T12:52:29.071+00:00"
+             RECORDSTATUS="ACTIVE">
+        <agent ROLE="EDITOR" TYPE="ORGANIZATION">
+            <name>ubc</name>
+        </agent>
+    </metsHdr>
+    <dmdSec ID="DMD_000" STATUS="ACTIVE">
+        <mdWrap MDTYPE="MODS">
+            <xmlData>
+                <mods xmlns="http://www.loc.gov/mods/v3">
+                    <originInfo eventType="distribution">
+                        <dateIssued encoding="iso8601" keyDate="yes">1995-06-21</dateIssued>
+                        <edition>[Electronic ed.]</edition>
+                    </originInfo>
+                    <name ID="CORP_B11AD185" displayLabel="mapping-hack-default-publisher" type="corporate"
+                          xlin:type="corporate" xmlns:xlin="http://www.w3.org/1999/xlink"/>
+                    <extension>
+                        <slub:info xmlns:slub="http://slub-dresden.de/">
+                            <slub:corporation address="09107 Chemnitz" place="Chemnitz" ref="CORP_B11AD185">
+                                <slub:university>Universitätsbibliothek Chemnitz</slub:university>
+                            </slub:corporation>
+                            <slub:corporation place="Chemnitz" ref="CORP_75AFE15" type="other">
+                                <slub:section>Universitätsrechenzentrum</slub:section>
+                            </slub:corporation>
+                        </slub:info>
+                    </extension>
+                    <abstract lang="ger" type="summary">InhaltsangabeNutzung der zentralen Rechentechnik
+                        Mainframe IBM 4381
+                        Ausbildungs- und Beratungszentrum
+                        Softwareangebot des PS/2-ABZ
+                        Public Domain Software
+                    </abstract>
+                    <classification authority="ddc">050</classification>
+                    <classification authority="ddc">004</classification>
+                    <classification authority="z">Public%Domain%Software</classification>
+                    <classification authority="z">zentrale Rechentechnik</classification>
+                    <classification authority="z">Beratungszentrum</classification>
+                    <classification authority="z">Ausbildungszentrum</classification>
+                    <classification authority="z">Mainframe</classification>
+                    <identifier type="qucosa:urn">urn:nbn:de:bsz:ch1-199500053</identifier>
+                    <name ID="CORP_75AFE15" displayLabel="mapping-hack-other" type="corporate">
+                        <namePart>Technische Universität Chemnitz</namePart>
+                        <role>
+                            <roleTerm authority="marcrelator" authorityURI="http://id.loc.gov/vocabulary/relators"
+                                      type="code" valueURI="http://id.loc.gov/vocabulary/relators/pbl">pbl
+                            </roleTerm>
+                        </role>
+                    </name>
+                    <name ID="PERS_7874799D" type="personal">
+                        <namePart type="family">Clauss</namePart>
+                        <role>
+                            <roleTerm authority="marcrelator" authorityURI="http://id.loc.gov/vocabulary/relators"
+                                      type="code" valueURI="http://id.loc.gov/vocabulary/relators/aut">aut
+                            </roleTerm>
+                        </role>
+                    </name>
+                    <name ID="PERS_51DD6848" type="personal">
+                        <namePart type="family">Ziegler</namePart>
+                        <role>
+                            <roleTerm authority="marcrelator" authorityURI="http://id.loc.gov/vocabulary/relators"
+                                      type="code" valueURI="http://id.loc.gov/vocabulary/relators/aut">aut
+                            </roleTerm>
+                        </role>
+                    </name>
+                    <name ID="PERS_4FF5C543" type="personal">
+                        <namePart type="family">Grunewald</namePart>
+                        <role>
+                            <roleTerm authority="marcrelator" authorityURI="http://id.loc.gov/vocabulary/relators"
+                                      type="code" valueURI="http://id.loc.gov/vocabulary/relators/aut">aut
+                            </roleTerm>
+                        </role>
+                    </name>
+                    <name ID="PERS_91E4745D" type="personal">
+                        <namePart type="family">Riedel</namePart>
+                        <role>
+                            <roleTerm authority="marcrelator" authorityURI="http://id.loc.gov/vocabulary/relators"
+                                      type="code" valueURI="http://id.loc.gov/vocabulary/relators/aut">aut
+                            </roleTerm>
+                        </role>
+                    </name>
+                    <name ID="PERS_30A42FC2" type="personal">
+                        <namePart type="family">Fischer</namePart>
+                        <role>
+                            <roleTerm authority="marcrelator" authorityURI="http://id.loc.gov/vocabulary/relators"
+                                      type="code" valueURI="http://id.loc.gov/vocabulary/relators/aut">aut
+                            </roleTerm>
+                        </role>
+                    </name>
+                    <language>
+                        <languageTerm authority="iso639-2b" type="code">ger</languageTerm>
+                    </language>
+                    <relatedItem type="host">
+                        <identifier type="urn">urn:nbn:de:bsz:ch1-qucosa-62094</identifier>
+                    </relatedItem>
+                    <part order="19912"/>
+                    <physicalDescription>
+                        <digitalOrigin>born digital</digitalOrigin>
+                    </physicalDescription>
+                    <titleInfo lang="ger" usage="primary">
+                        <title>Mitteilungen des URZ 2/1991</title>
+                    </titleInfo>
+                </mods>
+            </xmlData>
+        </mdWrap>
+    </dmdSec>
+    <amdSec ID="AMD_000">
+        <techMD ID="TECH_000">
+            <mdWrap MDTYPE="OTHER" MIMETYPE="application/vnd.slub-info+xml" OTHERMDTYPE="SLUBINFO">
+                <xmlData>
+                    <info xmlns="http://slub-dresden.de/">
+                        <documentType>issue</documentType>
+                        <rights>
+                            <agreement given="yes"/>
+                            <attachment hasArchivalValue="yes" isDownloadable="yes" isRedistributable="yes"
+                                        ref="ATT-0"/>
+                            <attachment hasArchivalValue="yes" isDownloadable="yes" isRedistributable="yes"
+                                        ref="ATT-1"/>
+                            <attachment hasArchivalValue="yes" isDownloadable="yes" isRedistributable="yes"
+                                        ref="ATT-2"/>
+                        </rights>
+                    </info>
+                </xmlData>
+            </mdWrap>
+        </techMD>
+    </amdSec>
+    <fileSec>
+        <fileGrp USE="ORIGINAL"/>
+        <fileGrp USE="DOWNLOAD">
+            <file CHECKSUM="80859cbd1d93e8ec9f5448f6588e6d00580807f49b49cf3afc50d69c48188569aa1e113c6ba37a75878b752adb59e6adad465d3514fbc97c0ff0fb27ab3414a4"
+                  CHECKSUMTYPE="SHA-512" ID="ATT-2" MIMETYPE="text/plain" USE="ARCHIVE" mext:LABEL="Digitale Signatur">
+                <FLocat LOCTYPE="URL"
+                        href="http://192.168.42.28:8080/fedora/objects/qucosa:48666/datastreams/ATT-2/content"
+                        title="Digitale Signatur"/>
+            </file>
+            <file CHECKSUM="860891364e56be5a259e4637c0aee89d6ea28a16a42110a5a2cb3454db53f6679132d9ee27d8426a344bc79573cd30379ce41fb1a0c0689b49eacaf020e907c8"
+                  CHECKSUMTYPE="SHA-512" ID="ATT-1" MIMETYPE="application/x-dvi" USE="ARCHIVE"
+                  mext:LABEL="Volltext (dvi)">
+                <FLocat LOCTYPE="URL"
+                        href="http://192.168.42.28:8080/fedora/objects/qucosa:48666/datastreams/ATT-1/content"
+                        title="Volltext (dvi)"/>
+            </file>
+            <file CHECKSUM="ac4686c86f388225f5b70436d2c64ea2a0fb91afe59d1eb125013331f97665ca80827f2f79453e3e3a7816ac28ae41a723e06e0488f6d7cff575c1f9a2a8b204"
+                  CHECKSUMTYPE="SHA-512" ID="ATT-0" MIMETYPE="application/pdf" USE="ARCHIVE"
+                  mext:LABEL="Volltext (pdf)">
+                <FLocat LOCTYPE="URL"
+                        href="http://192.168.42.28:8080/fedora/objects/qucosa:48666/datastreams/ATT-0/content"
+                        title="Volltext (pdf)"/>
+            </file>
+        </fileGrp>
+    </fileSec>
+    <structMap TYPE="LOGICAL">
+        <div DMDID="DMD_000" ID="LOG_001" TYPE="issue">
+            <fptr FILEID="ATT-2"/>
+            <fptr FILEID="ATT-1"/>
+            <fptr FILEID="ATT-0"/>
+        </div>
+    </structMap>
+</mets>
