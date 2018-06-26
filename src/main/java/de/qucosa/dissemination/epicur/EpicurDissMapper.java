@@ -1,21 +1,6 @@
 package de.qucosa.dissemination.epicur;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
+import de.dnb.xepicur.Epicur;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
 import org.jdom2.JDOMException;
@@ -23,7 +8,19 @@ import org.jdom2.input.SAXBuilder;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-import de.dnb.xepicur.Epicur;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Map;
 
 public class EpicurDissMapper {
     private org.jdom2.Document metsDoc = null;
@@ -38,18 +35,9 @@ public class EpicurDissMapper {
 
     private static final String XEPICUR_SCHEMA_LOCATION = "urn:nbn:de:1111-2004033116 http://www.persistent-identifier.de/xepicur/version1.0/xepicur.xsd";
 
-    @SuppressWarnings("serial")
-    private Map<String, String> agentNameSubstitutions = new HashMap<String, String>() {
-        {
-            put("ubc", "monarch");
-        }
-        {
-            put("ubl", "ul");
-        }
-    };
+    private Map<String, String> agentNameSubstitutions;
 
-    public EpicurDissMapper(String transferUrlPattern, String frontpageUrlPattern, String agentNameSubstitutions, boolean transferUrlPidencode)
-            throws JDOMException, IOException {
+    public EpicurDissMapper(String transferUrlPattern, String frontpageUrlPattern, String agentNameSubstitutions, boolean transferUrlPidencode) {
         this.transferUrlPattern = transferUrlPattern;
         this.frontpageUrlPattern = frontpageUrlPattern;
         this.agentNameSubstitutions = decodeSubstitutions(agentNameSubstitutions);
@@ -57,7 +45,7 @@ public class EpicurDissMapper {
     }
 
     public Document transformEpicurDiss(Document metsDoc) throws JAXBException, EpicurBuilderException,
-            ParserConfigurationException, UnsupportedEncodingException, SAXException, IOException, JDOMException {
+            ParserConfigurationException, SAXException, IOException, JDOMException {
         this.metsDoc = new SAXBuilder().build(jdom2Build(metsDoc));
         epicurBuilder
             .encodePid(transferUrlPidencode)
@@ -71,7 +59,7 @@ public class EpicurDissMapper {
         dbf.setNamespaceAware(true);
         DocumentBuilder db = dbf.newDocumentBuilder();
 
-        Document epicurDoc = null;
+        Document epicurDoc;
         StringWriter stringWriter = new StringWriter();
         Marshaller marshaller = JAXBContext.newInstance(Epicur.class).createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, XEPICUR_SCHEMA_LOCATION);
