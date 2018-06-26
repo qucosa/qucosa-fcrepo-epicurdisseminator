@@ -5,6 +5,8 @@ import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -23,6 +25,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class EpicurDissMapper {
+    private Logger logger = LoggerFactory.getLogger(EpicurDissMapper.class);
+
     private org.jdom2.Document metsDoc = null;
     
     private EpicurBuilder epicurBuilder = new EpicurBuilder();
@@ -45,8 +49,14 @@ public class EpicurDissMapper {
     }
 
     public Document transformEpicurDiss(Document metsDoc) throws JAXBException, EpicurBuilderException,
-            ParserConfigurationException, SAXException, IOException, JDOMException {
-        this.metsDoc = new SAXBuilder().build(jdom2Build(metsDoc));
+            ParserConfigurationException, SAXException, IOException {
+
+        try {
+            this.metsDoc = new SAXBuilder().build(jdom2Build(metsDoc));
+        } catch (JDOMException e) {
+            logger.error("Cannot JDOM 2 document build.", e);
+        }
+
         epicurBuilder
             .encodePid(transferUrlPidencode)
             .agentNameSubstitutions(agentNameSubstitutions)
