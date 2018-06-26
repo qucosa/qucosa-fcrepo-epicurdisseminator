@@ -30,6 +30,7 @@ public class EpicurBuilder {
     private static final Namespace MODS = Namespace.getNamespace("mods", "http://www.loc.gov/mods/v3");
     private static final Namespace METS = Namespace.getNamespace("mets", "http://www.loc.gov/METS/");
     private static final Namespace XLINK = Namespace.getNamespace("xlink", "http://www.w3.org/1999/xlink");
+    private static final Namespace MEXT = Namespace.getNamespace("mext", "http://slub-dresden.de/mets");
 
     private static final XPathExpression XPATH_QUCOSA_URN = XPathFactory.instance()
             .compile("//mods:mods/mods:identifier[@type='qucosa:urn']", Filters.fpassthrough(), null, MODS);
