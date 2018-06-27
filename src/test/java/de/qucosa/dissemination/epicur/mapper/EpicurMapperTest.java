@@ -46,7 +46,7 @@ public class EpicurMapperTest {
 
         try {
             db = dbf.newDocumentBuilder();
-            mets = db.parse(getClass().getResourceAsStream("/qucosa-48666.xml"));
+            mets = db.parse(getClass().getResourceAsStream("/hochschulschrift_TEST.xml"));
             EpicurDissMapper mapper = new EpicurDissMapper("http://test.##AGENT##.qucosa.de/id/##PID##", "", "", true);
             epicurRes = mapper.transformEpicurDiss(mets);
         } catch (SAXException | ParserConfigurationException e) {
