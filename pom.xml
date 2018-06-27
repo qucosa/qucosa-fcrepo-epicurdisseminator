@@ -74,11 +74,11 @@
             <version>2.3.0</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.eclipse.birt.runtime.3_7_1</groupId>
-            <artifactId>org.apache.xml.serializer</artifactId>
-            <version>2.7.1</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.eclipse.birt.runtime.3_7_1</groupId>-->
+            <!--<artifactId>org.apache.xml.serializer</artifactId>-->
+            <!--<version>2.7.1</version>-->
+        <!--</dependency>-->
 
         <dependency>
             <groupId>xerces</groupId>
