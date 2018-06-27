@@ -17,7 +17,6 @@
 
 package de.qucosa.dissemination.epicur.mapper;
 
-import de.qucosa.dissemination.epicur.EpicurBuilderException;
 import de.qucosa.dissemination.epicur.EpicurDissMapper;
 import org.junit.Assert;
 import org.junit.Test;
@@ -26,11 +25,9 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-import javax.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 import java.io.IOException;
 
 public class EpicurMapperTest {
@@ -53,8 +50,6 @@ public class EpicurMapperTest {
             logger.error("Cannot parse mets xml.", e);
         } catch (IOException e) {
             logger.error("", e);
-        } catch (JAXBException | EpicurBuilderException | TransformerException e) {
-            logger.error("Connaot transform epicur dissemination.", e);
         }
 
 
