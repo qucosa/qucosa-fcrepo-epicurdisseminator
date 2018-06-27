@@ -48,7 +48,7 @@
                         </role>
                     </name>
                     <name ID="PERS_7874799D" type="personal">
-                        <namePart type="family">Clauss</namePart>
+                        <namePart type="family">Max</namePart>
                         <role>
                             <roleTerm authority="marcrelator" authorityURI="http://id.loc.gov/vocabulary/relators"
                                       type="code" valueURI="http://id.loc.gov/vocabulary/relators/aut">aut
@@ -56,7 +56,7 @@
                         </role>
                     </name>
                     <name ID="PERS_51DD6848" type="personal">
-                        <namePart type="family">Ziegler</namePart>
+                        <namePart type="family">Mustermann</namePart>
                         <role>
                             <roleTerm authority="marcrelator" authorityURI="http://id.loc.gov/vocabulary/relators"
                                       type="code" valueURI="http://id.loc.gov/vocabulary/relators/aut">aut
@@ -64,7 +64,7 @@
                         </role>
                     </name>
                     <name ID="PERS_4FF5C543" type="personal">
-                        <namePart type="family">Grunewald</namePart>
+                        <namePart type="family">Testwald</namePart>
                         <role>
                             <roleTerm authority="marcrelator" authorityURI="http://id.loc.gov/vocabulary/relators"
                                       type="code" valueURI="http://id.loc.gov/vocabulary/relators/aut">aut
@@ -72,7 +72,7 @@
                         </role>
                     </name>
                     <name ID="PERS_91E4745D" type="personal">
-                        <namePart type="family">Riedel</namePart>
+                        <namePart type="family">Maxi</namePart>
                         <role>
                             <roleTerm authority="marcrelator" authorityURI="http://id.loc.gov/vocabulary/relators"
                                       type="code" valueURI="http://id.loc.gov/vocabulary/relators/aut">aut
@@ -80,7 +80,7 @@
                         </role>
                     </name>
                     <name ID="PERS_30A42FC2" type="personal">
-                        <namePart type="family">Fischer</namePart>
+                        <namePart type="family">Test</namePart>
                         <role>
                             <roleTerm authority="marcrelator" authorityURI="http://id.loc.gov/vocabulary/relators"
                                       type="code" valueURI="http://id.loc.gov/vocabulary/relators/aut">aut
