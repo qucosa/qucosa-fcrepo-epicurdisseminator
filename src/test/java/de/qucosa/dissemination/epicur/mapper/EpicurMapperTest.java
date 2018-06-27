@@ -21,6 +21,8 @@ import de.qucosa.dissemination.epicur.EpicurBuilderException;
 import de.qucosa.dissemination.epicur.EpicurDissMapper;
 import org.junit.Assert;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -28,19 +30,34 @@ import javax.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 import java.io.IOException;
 
 public class EpicurMapperTest {
+    private Logger logger = LoggerFactory.getLogger(EpicurMapperTest.class);
     
     @Test
-    public void Find_epicur_tag_in_mapped_document() throws ParserConfigurationException, SAXException, IOException, JAXBException, EpicurBuilderException {
+    public void Find_epicur_tag_in_mapped_document() {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        Document mets = db.parse(getClass().getResourceAsStream("/qucosa-48666.xml"));
-        EpicurDissMapper mapper = new EpicurDissMapper("http://test.##AGENT##.qucosa.de/id/##PID##", "", "", true);
-        Document epicurRes = mapper.transformEpicurDiss(mets);
-        
+        DocumentBuilder db = null;
+        Document mets = null;
+        Document epicurRes = null;
+
+        try {
+            db = dbf.newDocumentBuilder();
+            mets = db.parse(getClass().getResourceAsStream("/qucosa-48666.xml"));
+            EpicurDissMapper mapper = new EpicurDissMapper("http://test.##AGENT##.qucosa.de/id/##PID##", "", "", true);
+            epicurRes = mapper.transformEpicurDiss(mets);
+        } catch (SAXException | ParserConfigurationException e) {
+            logger.error("Cannot parse mets xml.", e);
+        } catch (IOException e) {
+            logger.error("", e);
+        } catch (JAXBException | EpicurBuilderException | TransformerException e) {
+            logger.error("Connaot transform epicur dissemination.", e);
+        }
+
+
         Assert.assertEquals("epicur", epicurRes.getDocumentElement().getTagName());
     }
 }
