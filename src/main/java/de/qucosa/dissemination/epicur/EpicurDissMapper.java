@@ -70,14 +70,15 @@ public class EpicurDissMapper {
         this.transferUrlPidencode = transferUrlPidencode;
     }
 
-    public Document transformEpicurDiss(Document metsDoc) throws JAXBException, EpicurBuilderException,
-            ParserConfigurationException, SAXException, IOException, TransformerException {
+    public Document transformEpicurDiss(Document metsDoc) {
 
         try {
             SAXBuilder saxBuilder = new SAXBuilder();
             this.metsDoc = saxBuilder.build(jdom2Build(metsDoc));
-        } catch (JDOMException e) {
+        } catch (JDOMException | TransformerException e) {
             logger.error("Cannot JDOM 2 document build.", e);
+        } catch (IOException e) {
+            logger.error("", e);
         }
 
         epicurBuilder
@@ -90,15 +91,24 @@ public class EpicurDissMapper {
         
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
-        DocumentBuilder db = dbf.newDocumentBuilder();
+        DocumentBuilder db = null;
+        Document epicurDoc = null;
 
-        Document epicurDoc;
-        StringWriter stringWriter = new StringWriter();
-        Marshaller marshaller = JAXBContext.newInstance(Epicur.class).createMarshaller();
-        marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, XEPICUR_SCHEMA_LOCATION);
-        marshaller.marshal(epicurBuilder.build(), stringWriter);
+        try {
+            db = dbf.newDocumentBuilder();
+            StringWriter stringWriter = new StringWriter();
+            Marshaller marshaller = JAXBContext.newInstance(Epicur.class).createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, XEPICUR_SCHEMA_LOCATION);
+            marshaller.marshal(epicurBuilder.build(), stringWriter);
+            epicurDoc = db.parse(new ByteArrayInputStream(stringWriter.toString().getBytes("UTF-8")));
+        } catch (ParserConfigurationException | SAXException e) {
+            logger.error("Cannot parse mets xml.", e);
+        } catch (IOException e) {
+            logger.error("", e);
+        } catch (JAXBException | EpicurBuilderException e) {
+            logger.error("Connaot transform epicur dissemination.", e);
+        }
 
-        epicurDoc = db.parse(new ByteArrayInputStream(stringWriter.toString().getBytes("UTF-8")));
 
         return epicurDoc;
     }
