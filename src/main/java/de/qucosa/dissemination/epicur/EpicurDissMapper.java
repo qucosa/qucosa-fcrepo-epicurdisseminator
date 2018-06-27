@@ -91,7 +91,7 @@ public class EpicurDissMapper {
         
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
-        DocumentBuilder db = null;
+        DocumentBuilder db;
         Document epicurDoc = null;
 
         try {

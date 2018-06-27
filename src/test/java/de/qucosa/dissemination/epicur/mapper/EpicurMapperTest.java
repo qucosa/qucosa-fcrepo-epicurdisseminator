@@ -37,8 +37,8 @@ public class EpicurMapperTest {
     public void Find_epicur_tag_in_mapped_document() {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
-        DocumentBuilder db = null;
-        Document mets = null;
+        DocumentBuilder db;
+        Document mets;
         Document epicurRes = null;
 
         try {
