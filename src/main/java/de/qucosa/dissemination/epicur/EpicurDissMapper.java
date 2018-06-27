@@ -18,8 +18,6 @@
 package de.qucosa.dissemination.epicur;
 
 import de.dnb.xepicur.Epicur;
-import org.apache.xml.serialize.OutputFormat;
-import org.apache.xml.serialize.XMLSerializer;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.slf4j.Logger;
@@ -33,6 +31,13 @@ import javax.xml.bind.Marshaller;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -66,10 +71,11 @@ public class EpicurDissMapper {
     }
 
     public Document transformEpicurDiss(Document metsDoc) throws JAXBException, EpicurBuilderException,
-            ParserConfigurationException, SAXException, IOException {
+            ParserConfigurationException, SAXException, IOException, TransformerException {
 
         try {
-            this.metsDoc = new SAXBuilder().build(jdom2Build(metsDoc));
+            SAXBuilder saxBuilder = new SAXBuilder();
+            this.metsDoc = saxBuilder.build(jdom2Build(metsDoc));
         } catch (JDOMException e) {
             logger.error("Cannot JDOM 2 document build.", e);
         }
@@ -97,11 +103,13 @@ public class EpicurDissMapper {
         return epicurDoc;
     }
 
-    private InputStream jdom2Build(Document metsDoc) throws IOException {
+    private InputStream jdom2Build(Document metsDoc) throws IOException, TransformerException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        OutputFormat format = new OutputFormat(metsDoc);
-        XMLSerializer serializer = new XMLSerializer(outputStream, format);
-        serializer.serialize(metsDoc);
+        Source xmlSource = new DOMSource(metsDoc);
+        Result outputTarget = new StreamResult(outputStream);
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        Transformer transformer = transformerFactory.newTransformer();
+        transformer.transform(xmlSource, outputTarget);
         return new ByteArrayInputStream(outputStream.toByteArray());
     }
 
