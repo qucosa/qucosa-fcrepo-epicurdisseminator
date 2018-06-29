@@ -75,10 +75,9 @@ public class EpicurDissMapper {
         try {
             SAXBuilder saxBuilder = new SAXBuilder();
             this.metsDoc = saxBuilder.build(jdom2Build(metsDoc));
-        } catch (JDOMException | TransformerException e) {
-            logger.error("Cannot JDOM 2 document build.", e);
-        } catch (IOException e) {
-            logger.error("", e);
+        } catch (JDOMException | TransformerException | IOException e) {
+            logger.error("Cannot build JDOM2 document.", e);
+            throw new RuntimeException("Cannot build JDOM2 document.", e);
         }
 
         epicurBuilder
@@ -103,10 +102,10 @@ public class EpicurDissMapper {
             epicurDoc = db.parse(new ByteArrayInputStream(stringWriter.toString().getBytes("UTF-8")));
         } catch (ParserConfigurationException | SAXException e) {
             logger.error("Cannot parse mets xml.", e);
-        } catch (IOException e) {
-            logger.error("", e);
-        } catch (JAXBException | EpicurBuilderException e) {
+            throw new RuntimeException("Cannot parse mets xml.", e);
+        } catch (JAXBException | EpicurBuilderException | IOException e) {
             logger.error("Connaot transform epicur dissemination.", e);
+            throw new RuntimeException("Connaot transform epicur dissemination.", e);
         }
 
 
