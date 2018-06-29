@@ -34,23 +34,17 @@ public class EpicurMapperTest {
     private Logger logger = LoggerFactory.getLogger(EpicurMapperTest.class);
     
     @Test
-    public void Find_epicur_tag_in_mapped_document() {
+    public void Find_epicur_tag_in_mapped_document() throws ParserConfigurationException, IOException, SAXException {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
         DocumentBuilder db;
         Document mets;
         Document epicurRes = null;
 
-        try {
-            db = dbf.newDocumentBuilder();
-            mets = db.parse(getClass().getResourceAsStream("/hochschulschrift_TEST.xml"));
-            EpicurDissMapper mapper = new EpicurDissMapper("http://test.##AGENT##.qucosa.de/id/##PID##", "", "", true);
-            epicurRes = mapper.transformEpicurDiss(mets);
-        } catch (SAXException | ParserConfigurationException e) {
-            logger.error("Cannot parse mets xml.", e);
-        } catch (IOException e) {
-            logger.error("", e);
-        }
+        db = dbf.newDocumentBuilder();
+        mets = db.parse(getClass().getResourceAsStream("/hochschulschrift_TEST.xml"));
+        EpicurDissMapper mapper = new EpicurDissMapper("http://test.##AGENT##.qucosa.de/id/##PID##", "", "", true);
+        epicurRes = mapper.transformEpicurDiss(mets);
 
 
         Assert.assertEquals("epicur", epicurRes.getDocumentElement().getTagName());
